@@ -16,9 +16,20 @@ public class Main {
             System.out.println("2. Reserve a Seat");
             System.out.println("3. Cancel a seat Reservation");
             System.out.println("4. Exit");
-            System.out.print("Select an option (1 - 4): ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+
+            int choice;
+            while (true){
+                System.out.print("Select an option (1 - 4): ");
+                try {
+                    choice = scanner.nextInt();
+                    scanner.nextLine();
+                    if (choice >= 1 && choice <= 4) break;
+                    else System.out.println("Invalid option. Please enter a number between 1 and 4.");
+                } catch (Exception e){
+                    System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                    scanner.nextLine();
+                }
+            }
 
             switch (choice) {
                 case 1:
@@ -39,9 +50,6 @@ public class Main {
                     running = false;
                     System.out.println("Exiting the system. Goodbye!");
                     break;
-                default:
-                    System.out.println("Invalid option. Please try again.");
-                    SeatingManager.enterToContinue(scanner);
             }
         }
         scanner.close();
