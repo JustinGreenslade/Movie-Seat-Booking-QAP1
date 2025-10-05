@@ -12,49 +12,117 @@ public class SeatingManager {
     }
 
     public void reserveSeat() {
-        chart.displaySeatingChart();
-        System.out.print("Enter row number: ");
-        int row = scanner.nextInt() - 1;
-        System.out.print("Enter seat number: ");
-        int col = scanner.nextInt() - 1;
-        scanner.nextLine();
-
-        if (chart.reserveSeat(row, col)) {
+        if (chart.isFull()) {
             chart.displaySeatingChart();
-            System.out.println("Seat (" + (row + 1) + ", " + (col + 1) + ") successfully reserved!");
+            System.out.println("Sorry, the theater is fully booked. No seats available.");
             enterToContinue(scanner);
-        } else {
-            chart.displaySeatingChart();
-
-            System.out.print("Seat taken or invalid. Suggesting another seat...");
-            suggestAlternative(row);
-            enterToContinue(scanner);
+            clearScreen();
+            return;
         }
-    clearScreen();
+        while (true){
+            chart.displaySeatingChart();
+            System.out.println("Enter row number (-1 to cancel): ");
+            int inputRow = scanner.nextInt();
+            if(inputRow == -1){
+                System.out.println("Reservation process cancelled. Returning to main menu...");
+                enterToContinue(scanner);
+                scanner.nextLine();
+                clearScreen();
+                return;
+            }
+            int row = inputRow - 1;
+
+            System.out.print("Enter seat number (-1 to cancel): ");
+            int inputCol = scanner.nextInt();
+            scanner.nextLine();
+            if (inputCol == -1) {
+                System.out.println("Reservation process cancelled. Returning to main menu...");
+                enterToContinue(scanner);
+                clearScreen();
+                return;
+            }
+            int col = inputCol - 1;
+
+            // Out of bounds check
+            if(row < 0 || row >= chart.getRows() || col < 0 || col >= chart.getCols()) {
+                chart.displaySeatingChart();
+                System.out.println("Invalid seat selection. Please try again.");
+                suggestAlternative(row);
+                enterToContinue(scanner);
+                clearScreen();
+                continue;
+        }
+
+            if (chart.reserveSeat(row, col)) {
+                chart.displaySeatingChart();
+                System.out.println("Seat (" + (row + 1) + ", " + (col + 1) + ") successfully reserved!");
+                enterToContinue(scanner);
+                clearScreen();
+                return;
+            } else {
+                chart.displaySeatingChart();
+                System.out.print("Seat is taken. Suggesting another seat...");
+                suggestAlternative(row);
+                enterToContinue(scanner);
+                clearScreen();
+            }
+        }
     }
 
     public void cancelReservation() {
-        chart.displaySeatingChart();
-        System.out.print("Enter row number: ");
-        int row = scanner.nextInt() - 1;
-        System.out.print("Enter seat number: ");
-        int col = scanner.nextInt() - 1;
-        scanner.nextLine();
+        while (true) {
+            chart.displaySeatingChart();
+            System.out.print("Enter row number (-1 to cancel): ");
+            int inputRow = scanner.nextInt();
+            // if user wants to cancel reservation process
+            if (inputRow == -1) {
+                System.out.println("Cancellation process cancelled. Returning to main menu...");
+                scanner.nextLine();
+                enterToContinue(scanner);
+                clearScreen();
+                return;
+            }
+            int row = inputRow - 1;
 
-        if (chart.cancelSeat(row, col)) {
-            chart.displaySeatingChart();
-            System.out.println("Reservation for seat (" + (row + 1) + ", " + (col + 1) + ") successfully cancelled.");
-            enterToContinue(scanner);
-        } else {
-            chart.displaySeatingChart();
-            System.out.println("Seat (" + (row + 1) + ", " + (col + 1) + ") was not reserved.");
-            enterToContinue(scanner);
+            System.out.print("Enter seat number (-1 to cancel): ");
+            int inputCol = scanner.nextInt();
+            scanner.nextLine();
+            if(inputCol == -1){
+                System.out.println("Cancellation process cancelled. Returning to main menu...");
+                enterToContinue(scanner);
+                clearScreen();
+                return;
+            }
+            int col = inputCol - 1;
+
+            // Out of bounds check
+            if (row < 0 || row >= chart.getRows() || col < 0 || col >= chart.getCols()) {
+                chart.displaySeatingChart();
+                System.out.println("Invalid seat! That seat does not exist.");
+                enterToContinue(scanner);
+                clearScreen();
+                continue;
+            }
+
+            // try to cancel
+            if (chart.cancelSeat(row, col)) {
+                chart.displaySeatingChart();
+                System.out.println("Reservation for seat (" + (row + 1) + ", " + (col + 1) + ") successfully cancelled.");
+                enterToContinue(scanner);
+                clearScreen();
+                return;
+            } else {
+                chart.displaySeatingChart();
+                System.out.println("Seat (" + (row + 1) + ", " + (col + 1) + ") was not reserved.");
+                enterToContinue(scanner);
+                clearScreen();
+                return;
+            }
         }
-
-        clearScreen();
     }
 
     private void suggestAlternative(int row) {
+        // trys same row first.
         if (row >= 0 && row < chart.getRows()) {
             for (int c = 0; c < chart.getCols(); c++) {
                 if (!chart.isSeatTaken(row, c)) {
@@ -63,8 +131,8 @@ public class SeatingManager {
                 }
             }
         }
-
-        for (int r = row + 1; r < chart.getRows(); r++) {
+        // if no seats in that row trys whole chart
+        for (int r = 0; r < chart.getRows(); r++) {
             for (int c = 0; c < chart.getCols(); c++) {
                 if (!chart.isSeatTaken(r, c)) {
                     System.out.println("Try Row " + (r + 1) + ", Seat " + (c + 1));

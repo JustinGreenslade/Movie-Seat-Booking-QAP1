@@ -1,7 +1,5 @@
 package theater;
 
-import java.util.Arrays;
-
 import static theater.SeatingManager.clearScreen;
 
 public class SeatingChart {
@@ -76,5 +74,15 @@ public class SeatingChart {
     public int getCols() {
         return seats[0].length;
     }
+
+    public boolean isFull() {
+        for (int r = 0; r < seats.length; r++) {
+            for (int c = 0; c < seats[r].length; c++) {
+                if (seats[r][c] == 'O') return false;
+            }
+        }
+        return true;
+    }
+
 
 }
